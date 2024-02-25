@@ -12,25 +12,32 @@ services:
       docker volume create realdebrid -d rclone -o type=realdebrid -o realdebrid-api_key=your-api-key-here -o allow-other=true -o dir-cache-time=10s;
       docker run --rm -i -v=realdebrid:/tmp/myvolume busybox find /tmp/myvolume"
     environment:
-      - YOUR_API_KEY=your-api-key-here  # Replace your-api-key-here with your realdebrid API key
+      - YOUR_API_KEY=${real_debrid_API}  # Replace your-api-key-here with your realdebrid API key
     network_mode: host
     restart: "no"
 
   plex:
-    image: plexinc/pms-docker:plexpass
+    image: plexinc/pms-docker
     container_name: plex
     ports:
       - "32400:32400"
     volumes:
       - realdebrid:/torrents
+      - plexconfig:/plexconfig
+      - transcode:/transcode
     environment:
-      - TZ=Your/Timezone  # Set your timezone here
+      - PLEX_UID=${USERID}
+      - PLEX_GID=${USERID}
+      - TZ=${TIMEZONE}
+      - PLEX_CLAIM=${CLAIMTOKEN}
+    devices:
+      - /dev/dri:/dev/dri
     restart: unless-stopped
 
   plex_debrid:
     image: itstoggle/plex_debrid
     volumes:
-      - /path/to/config:/config  # Replace /path/to/config with your actual path
+      - /plexdebrid_config:/plexdebrid_config  # Replace /path/to/config with your actual path
     network_mode: host
     restart: unless-stopped
 
