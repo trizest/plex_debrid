@@ -25,6 +25,7 @@ services:
       - realdebrid:/torrents
       - plexconfig:/plexconfig
       - transcode:/transcode
+      #- PATH to MEDIA. to be updated. 
     environment:
       - PLEX_UID=${USERID}
       - PLEX_GID=${USERID}
