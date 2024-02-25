@@ -1,0 +1,39 @@
+version: '3'
+
+services:
+  setup:
+    image: busybox
+    volumes:
+      - ~/rclone/config:/config
+      - ~/rclone/cache:/cache
+    command: >
+      /bin/sh -c "
+      docker plugin install itstoggle/docker-volume-rclone_rd:amd64 args='-v' --alias rclone --grant-all-permissions config=/config cache=/cache;
+      docker volume create realdebrid -d rclone -o type=realdebrid -o realdebrid-api_key=your-api-key-here -o allow-other=true -o dir-cache-time=10s;
+      docker run --rm -i -v=realdebrid:/tmp/myvolume busybox find /tmp/myvolume"
+    environment:
+      - YOUR_API_KEY=your-api-key-here  # Replace your-api-key-here with your realdebrid API key
+    network_mode: host
+    restart: "no"
+
+  plex:
+    image: plexinc/pms-docker:plexpass
+    container_name: plex
+    ports:
+      - "32400:32400"
+    volumes:
+      - realdebrid:/torrents
+    environment:
+      - TZ=Your/Timezone  # Set your timezone here
+    restart: unless-stopped
+
+  plex_debrid:
+    image: itstoggle/plex_debrid
+    volumes:
+      - /path/to/config:/config  # Replace /path/to/config with your actual path
+    network_mode: host
+    restart: unless-stopped
+
+volumes:
+  realdebrid:
+    external: true
