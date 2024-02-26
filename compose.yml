@@ -1,21 +1,6 @@
 version: '3'
 
 services:
-  setup:
-    image: busybox
-    volumes:
-      - ~/rclone/config:/config
-      - ~/rclone/cache:/cache
-    command: >
-      /bin/sh -c "
-      docker plugin install itstoggle/docker-volume-rclone_rd:amd64 args='-v' --alias rclone --grant-all-permissions config=/config cache=/cache;
-      docker volume create realdebrid -d rclone -o type=realdebrid -o realdebrid-api_key=your-api-key-here -o allow-other=true -o dir-cache-time=10s;
-      docker run --rm -i -v=realdebrid:/tmp/myvolume busybox find /tmp/myvolume"
-    environment:
-      - YOUR_API_KEY=${real_debrid_API}  # Replace your-api-key-here with your realdebrid API key
-    network_mode: host
-    restart: "no"
-
   plex:
     image: plexinc/pms-docker
     container_name: plex
@@ -46,7 +31,7 @@ services:
   plex_debrid:
     image: itstoggle/plex_debrid
     volumes:
-      - /plexdebrid_config:/plexdebrid_config  # Replace /path/to/config with your actual path
+      - plexdebrid_config:/plexdebrid_config  # Replace /path/to/config with your actual path
     network_mode: host
     restart: unless-stopped
 
